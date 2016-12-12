@@ -40,9 +40,16 @@ var maxFuel= 3000;
 var player= {x: Canvas. width/ 2- 15, y: Canvas. height- 50, b: 30, l: 50, speedX: 0, speedY: 0, accX: 2, accY: 1.5, lw: 3, fs: "cyan", ss: "blue", fuel: maxFuel};
 
 
+var strip= {l: Canvas. height/ 5, b: Canvas. width* 1/ 100, y: -1* Canvas. height/ 5, speedY: Canvas. height/ 100};
+
+
 
 function generate( min, max)
 {
+  if( min< 1) min= 1;
+
+  if( min> max) max= min;
+
   return Math. random()* (max- min+ 1)+ min;
 }
 
@@ -72,7 +79,7 @@ function createHurdle()
     newHurdle. l= newHurdle. b+ Math. floor( generate( 30, 45) );
   }
 
-  newHurdle. x= Math. floor( generate( 1, Canvas. width- newHurdle. b));
+  newHurdle. x= Math. floor( generate( player. x- newHurdle. b, player. x+ player. b- newHurdle. b));
   newHurdle. y= 0- newHurdle. l;
 
   newHurdle. speedY= 2;
@@ -147,11 +154,33 @@ function animateFuelMeter()
 
 
 
+function drawStrips()
+{
+  var y1= strip. y;
+
+  while( y1<= Canvas. height)
+  {
+    draw( c2d, Canvas. width* 24.25/ 100, y1, strip. b, strip. l, 2, "white", "white");
+    draw( c2d, Canvas. width* 49.5/ 100, y1, strip. b, strip. l, 2, "white", "white");
+    draw( c2d, Canvas. width* 74.75/ 100, y1, strip. b, strip. l, 2, "white", "white");
+
+    y1+= strip. l* 3/ 2;
+  }
+
+  strip. y+= strip. speedY;
+
+  if( strip. y>= strip. l/ 2) strip. y= -1* strip. l;
+}
+
+
+
 function animate()
 {
   if( _end) return;
 
   c2d. clearRect( 0, 0, Canvas. width, Canvas. height);
+
+  drawStrips();
 
   draw( c2d, player. x, player. y, player. b, player. l, player. lw, player. fs, player. ss);
 
