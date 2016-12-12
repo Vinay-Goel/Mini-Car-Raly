@@ -35,7 +35,7 @@ var hurdle= [];
 
 var _end= false;
 
-var maxFuel= 300;
+var maxFuel= 3000;
 
 var player= {x: Canvas. width/ 2- 15, y: Canvas. height- 50, b: 30, l: 50, speedX: 0, speedY: 0, accX: 2, accY: 1.5, lw: 3, fs: "cyan", ss: "blue", fuel: maxFuel};
 
@@ -68,14 +68,14 @@ function createHurdle()
     newHurdle. fs= "red";
     newHurdle. ss= "yellow";
 
-    newHurdle. b= Math. floor( generate( 25, 35));
-    newHurdle. l= Math. floor( generate( 40, 60));
+    newHurdle. b= Math. floor( generate( 25, 50) );
+    newHurdle. l= newHurdle. b+ Math. floor( generate( 30, 45) );
   }
 
   newHurdle. x= Math. floor( generate( 1, Canvas. width- newHurdle. b));
   newHurdle. y= 0- newHurdle. l;
 
-  newHurdle. speedY= 1;
+  newHurdle. speedY= 2;
   newHurdle. lw= 3;
   newHurdle. active= true;
 
@@ -97,26 +97,27 @@ function check()
 
   for( var i= 0; i< sz; i++)
   {
+    if( !hurdle[ i]. active) continue;
+
     var x2= hurdle[ i]. x+ hurdle[ i]. b/ 2;
     var y2= hurdle[ i]. y+ hurdle[ i]. l/ 2;
 
-    var key= false;
+    var keyX= false, keyY= false;
 
-    if( x1>= x2) if( x1- x2<= player. b/ 2+ hurdle[ i]. b/ 2) key= true;
-    if( y1>= y2) if( y1- y2<= player. l/ 2+ hurdle[ i]. l/ 2) key= true;
+    if( x1>= x2) if( x1- x2<= player. b/ 2+ hurdle[ i]. b/ 2) keyX= true;
+    if( y1>= y2) if( y1- y2<= player. l/ 2+ hurdle[ i]. l/ 2) keyY= true;
 
-    if( x2> x1) if( x2- x1<= player. b/ 2+ hurdle[ i]. b/ 2) key= true;
-    if( y2> y1) if( y2- y1<= player. l/ 2+ hurdle[ i]. l/ 2) key= true;
+    if( x2> x1) if( x2- x1<= player. b/ 2+ hurdle[ i]. b/ 2) keyX= true;
+    if( y2> y1) if( y2- y1<= player. l/ 2+ hurdle[ i]. l/ 2) keyY= true;
 
-    if( key)
+    if( keyX && keyY)
     {
       if( hurdle[ i]. fuel)
       {
         player. fuel= maxFuel;
-        continue;
+        hurdle[ i]. active= false;
       }
-
-      _end= true;
+      if( !hurdle[ i]. fuel) _end= true;
     }
   }
 }
@@ -148,7 +149,7 @@ function animateFuelMeter()
 
 function animate()
 {
-  //if( _end) return;
+  if( _end) return;
 
   c2d. clearRect( 0, 0, Canvas. width, Canvas. height);
 
@@ -167,6 +168,8 @@ function animate()
 
   for( var i= 0; i< sz; i++)
   {
+    if( !hurdle[ i]. active) continue;
+
     draw( c2d, hurdle[ i]. x, hurdle[ i]. y, hurdle[ i]. b, hurdle[ i]. l, hurdle[ i]. lw, hurdle[ i]. fs, hurdle[ i]. ss);
 
     hurdle[ i]. y+= hurdle[ i]. speedY;
