@@ -11,11 +11,11 @@ var c2d= Canvas. getContext( "2d");
 var playerCanvas= document. getElementById( "player");
 var pc2d= playerCanvas. getContext( "2d");
 
-c2d. canvas. width= window. innerWidth/ 6;
-c2d. canvas. height= window. innerHeight* 7/ 10;
+Canvas. width= window. innerWidth/ 6;
+Canvas. height= window. innerHeight* 7/ 10;
 
-pc2d. canvas. width= window. innerWidth/ 10;
-pc2d. canvas. height= window. innerHeight* 7/ 10;
+playerCanvas. width= window. innerWidth/ 10;
+playerCanvas. height= window. innerHeight* 7/ 10;
 
 Canvas. style. position= "fixed";
 playerCanvas. style. position= "fixed";
@@ -29,6 +29,7 @@ playerCanvas. style. left= "53.5%";
 
 
 var createHurdleSpeed= 2000;
+var createHurdleAcc= 250;
 var animationSpeed= 10;
 
 var hurdle= [];
@@ -37,13 +38,13 @@ var _end= false;
 
 var maxFuel= 3000;
 
-var player= {x: Canvas. width/ 2- 15, y: Canvas. height- 50, b: 30, l: 50, speedX: 0, speedY: 0, accX: 2, accY: 1.5, lw: 3, fs: "cyan", ss: "blue", fuel: maxFuel};
+var player= {x: Canvas. width/ 2- 15, y: Canvas. height- 50, b: 30, l: 50, speedX: 0, speedY: 0, accX: 2, accY: 1.5, lw: 6, fs: "#ffe0e9", ss: "#4f0027", fuel: maxFuel};
 
 
 var strip= {l: Canvas. height/ 5, b: Canvas. width* 1/ 100, y: -1* Canvas. height/ 5, speedY: Canvas. height/ 100};
 
 
-var Rep= 30000;
+var Rep= 28000;
 var counter= 0;
 var score= 0;
 
@@ -53,7 +54,7 @@ function generate( min, max)
 {
   if( min< 1) min= 1;
 
-  if( min> max) max= min;
+  if( min> max) min= max;
 
   return Math. random()* (max- min+ 1)+ min;
 }
@@ -67,26 +68,35 @@ function createHurdle()
 
   var type= Math. floor( generate( frm, 50) );
 
-  newHurdle. speedY= 2;
+  newHurdle. speedY= 2+ score/ Rep/ 2;
+
+  strip. speedY= Canvas. height/ 100+ score/ Rep/ 2;
 
   if( type== 50)
   {
     newHurdle. fuel= true;
-    newHurdle. fs= "green";
-    newHurdle. ss= "green";
+    newHurdle. fs= "#c2ffdf";
+    newHurdle. ss= "#005331";
 
     newHurdle. b= 25;
     newHurdle. l= 40;
 
-    newHurdle. speedY*= 2;
+    newHurdle. speedY*= 1.1;
+
+    if( createHurdleSpeed> 900)
+    {
+      createHurdleSpeed-= createHurdleAcc;
+
+      createHurdleAcc-= 30;
+    }
 
     counter= 0;
   }
 
   if( type< 50)
   {
-    newHurdle. fs= "red";
-    newHurdle. ss= "yellow";
+    newHurdle. fs= "#efefef";
+    newHurdle. ss= "#464646";
 
     newHurdle. b= Math. floor( generate( 25, 50) );
     newHurdle. l= newHurdle. b+ Math. floor( generate( 30, 45) );
@@ -95,7 +105,7 @@ function createHurdle()
   newHurdle. x= Math. floor( generate( player. x- newHurdle. b, player. x+ player. b- newHurdle. b));
   newHurdle. y= 0- newHurdle. l;
 
-  newHurdle. lw= 3;
+  newHurdle. lw= 6;
   newHurdle. active= true;
 
   hurdle. push( newHurdle);
@@ -162,7 +172,16 @@ function draw( canv, x, y, b, l, lw, fs, ss)
 function animateFuelMeter()
 {
   pc2d. clearRect( 0, 0, playerCanvas. width, playerCanvas. height);
-  draw( pc2d, playerCanvas. width/ 3, 50+ (maxFuel- player. fuel)/ maxFuel* (playerCanvas. height- 100), playerCanvas. width/ 3, player. fuel/ maxFuel* (playerCanvas. height- 100), 2, "green", "green");
+
+  pc2d. font= "15px Verdana";
+  pc2d. fillStyle= "#ff0048";
+  pc2d. textAlign= "center";
+
+  pc2d. fillText( "--SCORE--", playerCanvas. width/ 2, 15);
+  pc2d. fillText( score, playerCanvas. width/ 2, 30);
+  pc2d. fillText( "--FUEL--", playerCanvas. width/ 2, playerCanvas. height- 20);
+
+  draw( pc2d, playerCanvas. width/ 3, 50+ (maxFuel- player. fuel)/ maxFuel* (playerCanvas. height- 100), playerCanvas. width/ 3, player. fuel/ maxFuel* (playerCanvas. height- 100), 6, "#c2ffdf", "#005331");
 }
 
 
@@ -189,7 +208,16 @@ function drawStrips()
 
 function animate()
 {
-  if( _end) return;
+  if( _end)
+  {
+    c2d. font= "30px Verdana";
+    c2d. fillStyle= "red";
+    c2d. textAlign= "center";
+
+    c2d. fillText( "GAME OVER!", Canvas. width/ 2, Canvas. height/ 2);
+
+    return;
+  }
 
   c2d. clearRect( 0, 0, Canvas. width, Canvas. height);
 
