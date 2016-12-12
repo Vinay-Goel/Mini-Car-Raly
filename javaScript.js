@@ -43,6 +43,11 @@ var player= {x: Canvas. width/ 2- 15, y: Canvas. height- 50, b: 30, l: 50, speed
 var strip= {l: Canvas. height/ 5, b: Canvas. width* 1/ 100, y: -1* Canvas. height/ 5, speedY: Canvas. height/ 100};
 
 
+var Rep= 30000;
+var counter= 0;
+var score= 0;
+
+
 
 function generate( min, max)
 {
@@ -58,7 +63,11 @@ function createHurdle()
 {
   var newHurdle= {x: 0, y: 0, b: 0, l: 0, speedY: 0, active: false, lw: 0, fs: "", ss: "", fuel: false};
 
-  var type= Math. floor( generate( 1, 50));
+  var frm= Math. ceil( counter/ Rep* 50 );
+
+  var type= Math. floor( generate( frm, 50) );
+
+  newHurdle. speedY= 2;
 
   if( type== 50)
   {
@@ -68,6 +77,10 @@ function createHurdle()
 
     newHurdle. b= 25;
     newHurdle. l= 40;
+
+    newHurdle. speedY*= 2;
+
+    counter= 0;
   }
 
   if( type< 50)
@@ -82,7 +95,6 @@ function createHurdle()
   newHurdle. x= Math. floor( generate( player. x- newHurdle. b, player. x+ player. b- newHurdle. b));
   newHurdle. y= 0- newHurdle. l;
 
-  newHurdle. speedY= 2;
   newHurdle. lw= 3;
   newHurdle. active= true;
 
@@ -149,7 +161,8 @@ function draw( canv, x, y, b, l, lw, fs, ss)
 
 function animateFuelMeter()
 {
-  if( player. fuel>= 0) draw( pc2d, 45, 50, 40, player. fuel* (playerCanvas. height- 100)/ maxFuel, 2, "green", "green");
+  pc2d. clearRect( 0, 0, playerCanvas. width, playerCanvas. height);
+  draw( pc2d, playerCanvas. width/ 3, 50+ (maxFuel- player. fuel)/ maxFuel* (playerCanvas. height- 100), playerCanvas. width/ 3, player. fuel/ maxFuel* (playerCanvas. height- 100), 2, "green", "green");
 }
 
 
@@ -207,6 +220,10 @@ function animate()
   }
 
   check();
+
+  counter+= animationSpeed;
+
+  score+= animationSpeed;
 
   setTimeout( animate, animationSpeed);
 }
